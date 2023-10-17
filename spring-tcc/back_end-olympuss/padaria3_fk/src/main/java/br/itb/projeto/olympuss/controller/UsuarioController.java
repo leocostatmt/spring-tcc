@@ -4,12 +4,15 @@ import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -62,6 +65,31 @@ public class UsuarioController {
 		serverMessage = "";
 		return "logne2";
 	}
+	
+	@PostMapping("/login")
+	public ResponseEntity<Usuario> getLoginApi(ModelMap model, @RequestBody Usuario _usuario,
+			HttpSession session) {
+		
+		
+		try {
+			Usuario usuario = usuarioService.findByEmail(_usuario.getEMAIL().toString());
+
+			if (usuario != null) {
+				if(usuario.getSENHA().equals(_usuario.getSENHA().toString())) {
+					return new ResponseEntity<>(usuario, HttpStatus.OK);
+				}
+				else {
+					return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+				}
+			} else {
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
+
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
 	@GetMapping("/listacliente")
 	public String listacliente(ModelMap model) {
 	
